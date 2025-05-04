@@ -1,0 +1,351 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin</title>
+    <!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap & Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+
+    <style>
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f4f4;
+        }
+
+       
+        .navbar {
+            background-color: #343a40;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 10;
+            font-weight: bolder;
+        }
+        
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ffc107;
+        }
+
+        .logout-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: -250px;
+            top: 0;
+            width: 250px;
+            height: 100%;
+            background-color: black;
+            padding-top: 60px;
+            transition: left 0.3s ease-in-out;
+            border-right: 2px solid white;
+            z-index: 2;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 15px;
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar a:hover {
+            background-color: #495057;
+        }
+
+        .sidebar.show {
+            left: 0;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: none;
+        }
+
+        .sidebar.show .close-btn {
+            display: block;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            padding: 20px;
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        .main-content.shift {
+            margin-left: 250px;
+        }
+
+        /* Dashboard Title */
+        .dashboard-title {
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #343a40;
+        }
+
+        /* Cards Container */
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        /* Individual Card Styling */
+        .dashboard-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            width: 250px;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Icon Styling */
+        .dashboard-card i {
+            font-size: 40px;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+
+        /* Card Title */
+        .dashboard-card h5 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #343a40;
+        }
+
+        /* Number Count */
+        .dashboard-card .count {
+            font-size: 22px;
+            font-weight: bold;
+            color: #007bff;
+            margin-top: 5px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .card-container {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+        .dashboard-card i{
+            color: gray;
+        }
+        .dashboard-card .count{
+            color: gray;
+        }
+        .dashboard-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+    border: none;
+}
+
+.dashboard-card:hover {
+    transform: scale(1.05);
+}
+
+.dashboard-card i {
+    font-size: 2rem;
+    color: gray; /* Make icons gray */
+}
+
+.dashboard-card h5, 
+.dashboard-card p {
+    margin: 5px 0;
+    color: black;
+}
+
+.dashboard-card:focus {
+    outline: none;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+}
+
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark">
+        <div class="navbar-left">
+            <button class="menu-btn" onclick="toggleSidebar()">
+                <i class="bi bi-list"></i>
+            </button>
+            <span class="navbar-brand">ECALSDS</span>
+        </div>
+        <div class="user-info">
+            <span>Welcome, {{ user.username }}</span>
+            <a href="{% url 'profile' %}">
+                <img src="{% static 'images/placeholder.png' %}" alt="Profile" class="profile-img">
+            </a>
+            <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <button class="close-btn" onclick="toggleSidebar()"><i class="bi bi-x"></i></button>
+        <a href="{% url 'admin_dashboard' %}"><i class="bi bi-shop"></i> Dashboard</a>
+        <a href="{% url 'seller_section' %}"><i class="bi bi-shop"></i> Sellers</a>
+        <a href="{% url 'buyer_section' %}"><i class="bi bi-cart"></i> Buyers</a>
+        <a href="{% url 'logistics_section' %}"><i class="bi bi-truck"></i> Logistics</a>
+        <a href="{% url 'company_section' %}"><i class="bi bi-buildings"></i> Companies</a>
+        <a href="{% url 'manage_locations' %}"><i class="bi bi-geo-alt"></i> Manage Locations</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <h1 class="dashboard-title">Admin Dashboard</h1>
+        <div class="card-container">
+            <button class="dashboard-card" data-bs-toggle="modal" data-bs-target="#sellersModal">
+                <i class="bi bi-people-fill"></i>
+                <h5>Total Sellers</h5>
+                <p class="count">{{ user_groups.seller.count }}</p>
+            </button>
+            <button class="dashboard-card" data-bs-toggle="modal" data-bs-target="#buyersModal">
+                <i class="bi bi-cart-fill"></i>
+                <h5>Total Buyers</h5>
+                <p class="count">{{ user_groups.buyer.count }}</p>
+            </button>
+            <button class="dashboard-card" data-bs-toggle="modal" data-bs-target="#logisticsModal">
+                <i class="bi bi-truck"></i>
+                <h5>Total Logistics</h5>
+                <p class="count">{{ user_groups.logistics.count }}</p>
+            </button>
+            <button class="dashboard-card" data-bs-toggle="modal" data-bs-target="#companiesModal">
+                <i class="bi bi-buildings"></i>
+                <h5>Total Companies</h5>
+                <p class="count">{{ companies.count }}</p>
+            </button>
+            <button class="dashboard-card" data-bs-toggle="modal" data-bs-target="#sellersSalesModal">
+                <i class="bi bi-currency-dollar"></i>
+                <h5>Total Sellers Sales</h5>
+                <p class="count">₱{{ total_sales|floatformat:2 }}</p>
+            </button>
+        </div>
+    </div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const sidebar = document.getElementById("sidebar");
+            const mainContent = document.getElementById("mainContent");
+    
+            // Keep sidebar open after refresh if it was open before
+            if (localStorage.getItem("sidebarOpen") === "true") {
+                sidebar.classList.add("show");
+                mainContent.classList.add("shift");
+            }
+        });
+    
+        function toggleSidebar() {
+            const sidebar = document.getElementById("sidebar");
+            const mainContent = document.getElementById("mainContent");
+    
+            if (!sidebar.classList.contains("show")) {
+                sidebar.classList.add("show");
+                mainContent.classList.add("shift");
+                localStorage.setItem("sidebarOpen", "true"); // Store sidebar state
+            } else {
+                sidebar.classList.remove("show");
+                mainContent.classList.remove("shift");
+                localStorage.setItem("sidebarOpen", "false"); // Store sidebar state
+            }
+        }
+        document.addEventListener("DOMContentLoaded", function () {
+    const sidebar = document.getElementById("sidebar");
+    const mainContent = document.getElementById("mainContent");
+
+    // Ensure sidebar is hidden on login unless user explicitly opens it
+    if (localStorage.getItem("sidebarOpen") === "true") {
+        sidebar.classList.add("show");
+        mainContent.classList.add("shift");
+    } else {
+        sidebar.classList.remove("show");
+        mainContent.classList.remove("shift");
+    }
+});
+
+    </script>
+
+</body>
+</html>

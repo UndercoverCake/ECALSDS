@@ -1,0 +1,24 @@
+<h2>Order Details - ID: {{ order.id }}</h2>
+<p>Current Status: <strong>{{ order.status }}</strong></p>
+
+<h3>Pick-Up Confirmation</h3>
+<ul>
+    {% for item in order.order_items.all %}
+    <li>
+        {{ item.product_name }} - 
+        {% if item.is_picked_up %}
+            Picked Up ✔️
+        {% else %}
+            <a href="{% url 'pick_up_item' order.id item.id %}" class="btn btn-success">Confirm Pick-Up</a>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+
+{% if order.status == "Shipped" %}
+    <button onclick="location.href='{% url 'mark_in_transit' order.id %}'" class="btn btn-warning">Mark In Transit</button>
+{% endif %}
+
+{% if order.status == "In Transit" %}
+    <button onclick="location.href='{% url 'mark_arrived' order.id %}'" class="btn btn-info">Mark Arrived</button>
+{% endif %}

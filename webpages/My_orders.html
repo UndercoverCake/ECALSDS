@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex flex-column min-vh-100">
+    <div class="container flex-grow-1">
+        <h1 class="page-title">Order Tracking</h1>
+        <table class="styled-table">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Latest Status</th>
+                    <th>Last Updated</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for update in tracking_updates %}
+                <tr>
+                    <td>
+                        {% if update.transaction_id %}
+                            <a href="{% url 'receipt_view' update.transaction_id %}">
+                                {{ update.receipt_number }}
+                            </a>
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                    <td>{{ update.status_update }}</td>
+                    <td>{{ update.timestamp }}</td> 
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="empty-message">No active orders to track.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .page-title {
+        text-align: center;
+        font-weight: 600;
+        color: black;
+        margin-bottom: 20px;
+    }
+    .styled-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        font-size: 16px;
+        text-align: left;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .styled-table th, .styled-table td {
+        padding: 12px;
+        border: 1px solid #ddd;
+    }
+    .styled-table thead {
+        background-color: black;
+        color: white;
+    }
+    .styled-table tbody tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+    .empty-message {
+        text-align: center;
+        font-style: italic;
+        color: gray;
+    }
+    .product-card {
+        background: white;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .product-desc {
+        color: #555;
+    }
+    .category {
+        font-size: 14px;
+        color: #003366;
+    }
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+    .modal-content {
+        background-color: #fff;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        border-radius: 8px;
+    }
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+    .close:hover {
+        color: black;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}

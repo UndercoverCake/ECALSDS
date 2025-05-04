@@ -1,0 +1,223 @@
+{% block content %}
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+<!-- Navbar Section -->
+<nav class="navbar navbar-dark">
+    <span class="navbar-brand">ECALSDS</span>
+    <div class="user-info">
+        
+        <span>Welcome, {{ user.username }}</span>
+        <button class="back-btn" onclick="window.history.back()">Back</button>
+
+        <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+
+</div>
+</nav>
+
+
+<div class="profile-container">
+    <h2>Update Profile</h2>
+    <form id="profile-form" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ form.as_p }}
+        </div>
+
+        {% if user.profile.profile_picture %}
+            <div class="profile-image">
+                <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture">
+            </div>
+        {% endif %}  
+        <button type="button" id="update-btn" class="btn-primary">Update Profile</button>
+        <div class="links">
+            <a href="{% url 'change_password' %}" class="btn-secondary">Change Password</a>
+            <a href="{% url 'delete_account' %}" class="btn-danger">Delete Account</a>
+        </div>
+    </form>
+</div>
+
+<div id="confirmModal" class="modal">
+    <div class="modal-content">
+        <p>Are you sure you want to update your profile?</p>
+        <button id="confirm-update" class="btn-primary">Yes</button>
+        <button id="cancel-update" class="btn-secondary">No</button>
+    </div>
+</div>
+
+<!-- Styles for Improved UI -->
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f8f9fa;
+        margin: 0;
+        padding: 0;
+    }
+
+    .navbar {
+            background-color: #343a40;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .navbar-brand {
+            color: white;
+            font-weight: 600;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            font-weight: 500;
+        }
+        .profile-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ffc107;
+        }
+        .logout-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            text-decoration: none;
+        }
+        .logout-btn:hover {
+            background-color: #c82333;
+            color: white;
+        }
+    .back-btn {
+        background-color: blue;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            text-decoration: none;
+        }
+        .back-btn:hover {
+            background-color: rgb(0, 0, 159);
+            color: white;
+        }
+
+    .profile-container {
+        max-width: 450px;
+        margin: 90px auto 30px;
+        padding: 20px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    .profile-container h2 {
+        margin-bottom: 20px;
+        font-size: 24px;
+        color: #333;
+    }
+
+    .profile-image img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 3px solid #007bff;
+        margin-top: 10px;
+    }
+
+    /* Button Styles */
+    .btn-primary, .btn-secondary, .btn-danger {
+        display: inline-block;
+        padding: 12px 18px;
+        border: none;
+        border-radius: 6px;
+        text-decoration: none;
+        cursor: pointer;
+        margin: 12px 8px;
+        font-size: 16px;
+        transition: 0.3s ease;
+        width: 90%;
+    }
+
+    .btn-primary {
+        background: #007bff;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #0056b3;
+    }
+
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background: #5a6268;
+    }
+
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #c82333;
+    }
+
+    /* Modal Styling */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-content {
+        background-color: white;
+        margin: 20% auto;
+        padding: 20px;
+        text-align: center;
+        width: 300px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+    // Event listener for updating profile
+    document.getElementById("update-btn").addEventListener("click", function() {
+        document.getElementById("confirmModal").style.display = "block";
+    });
+
+    // Event listener for confirming profile update
+    document.getElementById("confirm-update").addEventListener("click", function() {
+        document.getElementById("profile-form").submit();
+    });
+
+    // Event listener for canceling the update
+    document.getElementById("cancel-update").addEventListener("click", function() {
+        document.getElementById("confirmModal").style.display = "none";
+    });
+</script>
+
+{% endblock %}

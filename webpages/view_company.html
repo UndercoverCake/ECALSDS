@@ -1,0 +1,38 @@
+<h1>View Company</h1>
+<p><strong>Name:</strong> {{ company.name }}</p>
+<p><strong>Address:</strong> {{ company.address }}</p>
+<p><strong>Email:</strong> {{ company.email }}</p>
+<p><strong>Contact Number:</strong> {{ company.contact_number }}</p>
+
+<h2>Users in {{ company.name }}</h2>
+<table border="1">
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>User Type</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.profile.user_type }}</td>
+            <td>
+                <a href="{% url 'view_user' user.id %}">View</a>
+                <a href="{% url 'update_user' user.id %}">Edit</a>
+                <form action="{% url 'delete_user' user.id %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'update_company' company.id %}">Edit Company</a>
+<a href="{% url 'delete_company' company.id %}">Delete Company</a>
+<a href="{% url 'admin_dashboard' %}">Back to Admin Dashboard</a>

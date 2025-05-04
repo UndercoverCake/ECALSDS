@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}My Cart{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">My Cart</h1>
+
+    <!-- Alert Messages -->
+    <div id="alertBox" class="alert d-none" role="alert"></div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Product</th>
+                    <th>Variety</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart.items.all %}
+                <tr id="cart-item-{{ item.id }}">
+                    <td>{{ item.variety.product.name }}</td>
+                    <td>{{ item.variety.description }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>₱{{ item.variety.price }}</td>
+                    <td>₱{{ item.total_price }}</td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="confirmRemove({{ item.id }})">Remove</button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted">Your cart is empty.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h3 class="mt-4">Total: <span class="text-success">₱{{ cart.total_price }}</span></h3>
+
+    <button type="button" class="btn btn-primary btn-lg mt-3" onclick="confirmCheckout()">Proceed to Checkout</button>
+</div>
+
+<!-- JavaScript for Confirmation and Alerts -->
+<script>
+    function showAlert(message, type) {
+        const alertBox = document.getElementById('alertBox');
+        alertBox.innerText = message;
+        alertBox.className = `alert alert-${type}`;
+        alertBox.classList.remove('d-none');
+
+        // Hide alert after 3 seconds
+        setTimeout(() => {
+            alertBox.classList.add('d-none');
+        }, 3000);
+    }
+
+    function confirmRemove(itemId) {
+        if (confirm("Are you sure you want to remove this item from your cart?")) {
+            fetch(`{% url 'remove_from_cart' 0 %}`.replace('0', itemId), {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    document.getElementById(`cart-item-${itemId}`).remove();
+                    showAlert(data.message, 'success');
+                } else {
+                    showAlert(data.message, 'danger');
+                }
+            })
+            .catch(() => {
+                showAlert('An error occurred. Please try again.', 'danger');
+            });
+        }
+    }
+
+    function confirmCheckout() {
+        fetch("{% url 'checkout' %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                showAlert(data.message, 'success');
+                setTimeout(() => window.location.href = "{% url 'order_tracking' %}", 2000);
+            } else {
+                showAlert(data.message, 'danger');
+            }
+        })
+        .catch(() => {
+            showAlert('An error occurred during checkout. Please try again.', 'danger');
+        });
+    }
+</script>
+{% endblock %}

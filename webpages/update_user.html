@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit User</title>
+</head>
+<body>
+    <h1>Edit User</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" value="{{ user.username }}" required><br>
+
+        <label for="first_name">First Name:</label>
+        <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" required><br>
+
+        <label for="last_name">Last Name:</label>
+        <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" required><br>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" value="{{ user.email }}" required><br>
+
+        <label for="middle_name">Middle Name:</label>
+        <input type="text" id="middle_name" name="middle_name" value="{{ profile.middle_name }}"><br>
+
+        <label for="contact_number">Contact Number:</label>
+        <input type="text" id="contact_number" name="contact_number" value="{{ profile.contact_number }}"><br>
+
+        <label for="user_type">User Type:</label>
+        <select id="user_type" name="user_type">
+            <option value="admin" {% if profile.user_type == 'admin' %}selected{% endif %}>Admin</option>
+            <option value="seller" {% if profile.user_type == 'seller' %}selected{% endif %}>Seller</option>
+            <option value="buyer" {% if profile.user_type == 'buyer' %}selected{% endif %}>Buyer</option>
+            <option value="logistics" {% if profile.user_type == 'logistics' %}selected{% endif %}>Logistics</option>
+        </select><br>
+
+        <button type="submit">Save Changes</button>
+    </form>
+    <a href="{% url 'admin_dashboard' %}">Back to Dashboard</a>
+</body>
+</html>

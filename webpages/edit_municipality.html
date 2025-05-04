@@ -1,0 +1,7 @@
+<h2>Edit Municipality</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save Changes</button>
+</form>
+<a href="{% url 'admin_dashboard' %}">Back to Manage Locations</a>

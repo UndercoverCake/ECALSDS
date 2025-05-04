@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Transaction History{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column min-vh-100">
+    <div class="container mt-5 flex-grow-1">
+        <h2 class="text-center mb-4">Your Transactions</h2>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Receipt Number</th>
+                        <th>Total Price</th>
+                        <th>Date</th>
+                        <th>Tracking History</th> <!-- New Column -->
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in transactions %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'receipt_view' transaction.id %}" class="text-decoration-none fw-bold text-primary">
+                                {{ transaction.receipt.receipt_number }}
+                            </a>
+                        </td>
+                        <td>${{ transaction.total_price }}</td>
+                        <td>{{ transaction.created_at }}</td>
+                        <td>
+                            <a href="{% url 'tracking_history' transaction.order.id %}" class="text-decoration-none text-info">
+                                View History
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">No transactions found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

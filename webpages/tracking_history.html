@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background-color: #343a40;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .navbar-brand {
+            color: white;
+            font-weight: 600;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            font-weight: 500;
+        }
+        .profile-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ffc107;
+        }
+        .logout-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            text-decoration: none;
+        }
+        .logout-btn:hover {
+            background-color: #c82333;
+            color: white;
+        }
+/* Page Title */
+h1 {
+    margin-top: 30px;
+    text-align: center;
+    color: #444;
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+/* Table Container */
+.table-container {
+    width: 80%;
+    margin: auto;
+    overflow-x: auto;
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+    padding: 14px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color:#343a40;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+td {
+    color: #343a40;
+}
+
+tr:nth-child(even) {
+    background-color: #f7f7f7;
+}
+
+tr:hover {
+    background-color: #ddd;
+}
+
+/* No Tracking History Message */
+.no-history {
+    text-align: center;
+    font-style: italic;
+    color: #777;
+    padding: 14px;
+}
+
+/* Back to Dashboard Button */
+a.back-button {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    padding: 12px 20px;
+    background-color:#343a40;
+    color: white;
+    font-weight: bold;
+    border-radius: 5px;
+    text-decoration: none;
+    width: 220px;
+    margin: 30px auto;
+    transition: 0.3s;
+}
+
+a.back-button:hover {
+    background-color: #444;
+}
+</style>
+<nav class="navbar navbar-dark">
+    <span class="navbar-brand">ECALSDS</span>
+    <div class="user-info">
+        <span>Welcome, {{ user.username }}</span>
+        <a href="{% url 'profile' %}">
+            {% if user.profile and user.profile.profile_picture %}
+            <img src="{{ user.profile.profile_picture.url }}" alt="Profile" class="profile-img">
+            {% else %}
+            <img src="/static/images/placeholder.png" alt="Profile" class="profile-img">
+            {% endif %}
+        </a>
+        <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+    </div>
+</nav>
+<h1>Tracking History for Receipt {{ receipt_number }}</h1>
+
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Status Update</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in tracking_logs %}
+                <tr>
+                    <td>{{ log.status_update }}</td>
+                    <td>{{ log.timestamp }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="2" class="no-history">No tracking history available.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<a href="{% url 'logistics_dashboard' %}" class="back-button">Back to Dashboard</a>
+

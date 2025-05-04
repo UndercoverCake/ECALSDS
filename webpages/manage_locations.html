@@ -1,0 +1,512 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Management</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+
+    <style>
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .main-content {
+            margin-top: 80px;
+            padding: 20px;
+        }
+
+        .card {
+            background-color: white;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .section-title {
+            background-color: #343a40;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .table {
+            background-color: white;
+        }
+
+
+        .navbar {
+            background-color: #343a40;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 10;
+            font-weight: bolder;
+        }
+        
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ffc107;
+        }
+
+        .logout-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: -250px;
+            top: 0;
+            width: 250px;
+            height: 100%;
+            background-color: black;
+            padding-top: 60px;
+            transition: left 0.3s ease-in-out;
+            border-right: 2px solid white;
+            z-index: 2;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 15px;
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar a:hover {
+            background-color: #495057;
+        }
+
+        .sidebar.show {
+            left: 0;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: none;
+        }
+
+        .sidebar.show .close-btn {
+            display: block;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 80px;
+            padding: 20px;
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+        .main-content.shift {
+            margin-left: 250px;
+        }
+
+        /* Responsive Sidebar */
+        @media (max-width: 768px) {
+            .main-content.shift {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+{% block content %}
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark">
+        <div class="navbar-left">
+            <button class="menu-btn" onclick="toggleSidebar()">
+                <i class="bi bi-list"></i>
+            </button>
+            <span class="navbar-brand">ECALSDS</span>
+        </div>
+        <div class="user-info">
+            <span>Welcome, {{ user.username }}</span>
+            <a href="{% url 'profile' %}">
+                <img src="{% if user.profile and user.profile.profile_picture %}{{ user.profile.profile_picture.url }}{% else %}{% static 'images/placeholder.png' %}{% endif %}" alt="Profile" class="profile-img">
+            </a> 
+            <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <button class="close-btn" onclick="toggleSidebar()">
+            <i class="bi bi-x"></i>
+        </button>
+        <a href="{% url 'admin_dashboard' %}"><i class="bi bi-shop"></i> Dashboard</a>
+        <a href="{% url 'seller_section' %}"><i class="bi bi-shop"></i> Sellers</a>
+        <a href="{% url 'buyer_section' %}"><i class="bi bi-cart"></i> Buyers</a>
+        <a href="{% url 'logistics_section' %}"><i class="bi bi-truck"></i> Logistics</a>
+        <a href="{% url 'company_section' %}"><i class="bi bi-buildings"></i> Companies</a>
+        <a href="{% url 'manage_locations' %}"><i class="bi bi-geo-alt"></i> Manage Locations</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div class="card shadow p-3 mt-4">
+            <h2 class="section-title">Manage Locations</h2>
+    
+            <!-- Region Section -->
+            <div class="card mb-4">
+              <div class="card-header bg-dark text-white">
+                  Add Region
+              </div>
+              <div class="card-body">
+                <form method="POST" action="{% url 'add_region' %}">
+                  {% csrf_token %}
+                  <div class="form-group mb-2">
+                      <label for="id_name">Region Name</label>
+                      {{ region_form.name }}
+                      {% if region_form.name.errors %}
+                          <div class="text-danger">{{ region_form.name.errors }}</div>
+                      {% endif %}
+                  </div>
+                  <button type="submit" class="btn btn-primary">Add Region</button>
+              </form>              
+                  <hr>
+                  <h5>Existing Regions</h5>
+                  <ul class="list-group">
+                      {% for region in regions %}
+                          <li class="list-group-item d-flex justify-content-between align-items-center">
+                              <span>{{ region.name }}</span>
+                              <div>
+                                  <button class="btn btn-sm btn-danger delete-btn" data-bs-toggle="modal" data-bs-target="#deleteRegionModal" data-id="{{ region.id }}">
+                                      <i class="bi bi-trash"></i>
+                                  </button>
+                              </div>
+                          </li>
+                      {% empty %}
+                          <li class="list-group-item text-muted">No regions available.</li>
+                      {% endfor %}
+                  </ul>                  
+              </div>
+          </div>
+          
+    
+            <!-- Province Section -->
+            <div class="card mb-4">
+              <div class="card-header bg-dark text-white">
+                  Add Province
+              </div>
+              <div class="card-body">
+                  <form method="POST" action="{% url 'add_province' %}">
+                      {% csrf_token %}
+                      <div class="form-group mb-2">
+                          {{ province_form.as_p }}
+                      </div>
+                      <button type="submit" class="btn btn-primary">Add Province</button>
+                  </form>
+                  <hr>
+                  <h5>Existing Provinces</h5>
+                  <ul class="list-group">
+                      {% for province in provinces %}
+                          <li class="list-group-item d-flex justify-content-between align-items-center">
+                              <span>{{ province.name }} <small class="text-muted">(Region: {{ province.region.name }})</small></span>
+                              <div>
+                                  <button class="btn btn-sm btn-danger delete-btn" data-bs-toggle="modal" data-bs-target="#deleteProvinceModal" data-id="{{ province.id }}">
+                                      <i class="bi bi-trash"></i>
+                                  </button>
+                              </div>
+                          </li>
+                      {% empty %}
+                          <li class="list-group-item text-muted">No provinces available.</li>
+                      {% endfor %}
+                  </ul>
+              </div>
+          </div>
+          
+            <!-- Municipality Section -->
+            <div class="card mb-4">
+              <div class="card-header bg-dark text-white">
+                  Add Municipality
+              </div>
+              <div class="card-body">
+                  <form method="POST" action="{% url 'add_municipality' %}">
+                      {% csrf_token %}
+                      <div class="form-group mb-2">
+                          {{ municipality_form.as_p }}
+                      </div>
+                      <button type="submit" class="btn btn-primary">Add Municipality</button>
+                  </form>
+                  <hr>
+                  <h5>Existing Municipalities</h5>
+                  <ul class="list-group">
+                      {% for municipality in municipalities %}
+                          <li class="list-group-item d-flex justify-content-between align-items-center">
+                              <span>{{ municipality.name }} <small class="text-muted">(Province: {{ municipality.province.name }})</small></span>
+                              <div>
+                                  <button class="btn btn-sm btn-danger delete-btn" data-bs-toggle="modal" data-bs-target="#deleteMunicipalityModal" data-id="{{ municipality.id }}">
+                                      <i class="bi bi-trash"></i>
+                                  </button>
+                              </div>
+                          </li>
+                      {% empty %}
+                          <li class="list-group-item text-muted">No municipalities available.</li>
+                      {% endfor %}
+                  </ul>
+              </div>
+          </div>
+          
+            <!-- Barangay Section -->
+            <div class="card mb-4">
+              <div class="card-header bg-dark text-white">
+                  Add Barangay
+              </div>
+              <div class="card-body">
+                  <form method="POST" action="{% url 'add_barangay' %}">
+                      {% csrf_token %}
+                      <div class="form-group mb-2">
+                          {{ barangay_form.as_p }}
+                      </div>
+                      <button type="submit" class="btn btn-primary">Add Barangay</button>
+                  </form>
+                  <hr>
+                  <h5>Existing Barangays</h5>
+                  <ul class="list-group">
+                      {% for barangay in barangays %}
+                          <li class="list-group-item d-flex justify-content-between align-items-center">
+                              <span>{{ barangay.name }} <small class="text-muted">(Municipality: {{ barangay.municipality.name }})</small></span>
+                              <div>
+                                  <button class="btn btn-sm btn-danger delete-btn" data-bs-toggle="modal" data-bs-target="#deleteBarangayModal" data-id="{{ barangay.id }}">
+                                      <i class="bi bi-trash"></i>
+                                  </button>
+                              </div>
+                          </li>
+                      {% empty %}
+                          <li class="list-group-item text-muted">No barangays available.</li>
+                      {% endfor %}
+                  </ul>
+              </div>
+          </div>
+          
+
+        <!-- Delete Region Modal (only ONE modal, outside the loop!) -->
+        <div class="modal fade" id="deleteRegionModal" tabindex="-1" aria-labelledby="deleteRegionModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <form method="POST" id="deleteRegionForm">
+              {% csrf_token %}
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="deleteRegionModalLabel">Delete Region</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <input type="hidden" name="id" id="deleteRegionId">
+                  <p>Are you sure you want to delete this region?</p>
+                </div>
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-danger">Delete</button>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+<!---Province-->                            
+                  <div class="modal fade" id="deleteProvinceModal" tabindex="-1" aria-labelledby="deleteProvinceModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                      <form method="POST" id="deleteProvinceForm">
+                        {% csrf_token %}
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="deleteProvinceModalLabel">Delete Province</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            <input type="hidden" name="id" id="deleteProvinceId">
+                            <p>Are you sure you want to delete this province?</p>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+<!--Municipality-->  
+                  <div class="modal fade" id="deleteMunicipalityModal" tabindex="-1" aria-labelledby="deleteMunicipalityModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                  
+                        {% csrf_token %}
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="deleteMunicipalityModalLabel">Delete Municipality</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            <input type="hidden" name="id" id="deleteMunicipalityId">
+                            <p>Are you sure you want to delete this municipality?</p>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+
+<!---Barangay-->
+
+  <div class="modal fade" id="deleteBarangayModal" tabindex="-1" aria-labelledby="deleteBarangayModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      
+        {% csrf_token %}
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deleteBarangayModalLabel">Delete Barangay</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" name="id" id="deleteBarangayId">
+            <p>Are you sure you want to delete this barangay?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-danger">Delete</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+      
+
+
+              
+{% endblock %}
+</div>
+</div>
+</body>
+    
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+      const sidebar = document.getElementById("sidebar");
+      const mainContent = document.getElementById("mainContent");
+
+      if (localStorage.getItem("sidebarOpen") === "true") {
+          sidebar.classList.add("show");
+          mainContent.classList.add("shift");
+      }
+  });
+
+  function toggleSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      const mainContent = document.getElementById("mainContent");
+
+      if (!sidebar.classList.contains("show")) {
+          sidebar.classList.add("show");
+          mainContent.classList.add("shift");
+          localStorage.setItem("sidebarOpen", "true");
+      } else {
+          sidebar.classList.remove("show");
+          mainContent.classList.remove("shift");
+          localStorage.setItem("sidebarOpen", "false");
+      }
+  }
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+    const deleteForm = document.getElementById('deleteRegionForm');
+    const deleteRegionIdInput = document.getElementById('deleteRegionId');
+
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const regionId = this.getAttribute('data-id');
+            deleteRegionIdInput.value = regionId;
+            deleteForm.action = `/locations/region/${regionId}/delete/`;  // ✅ CORRECT endpoint
+        });
+    });
+});
+
+
+document.addEventListener('DOMContentLoaded', function() {
+
+  const deleteProvButtons = document.querySelectorAll('.delete-prov-btn');
+  const deleteProvForm    = document.getElementById('deleteProvinceForm');
+  const deleteProvIdInput = document.getElementById('deleteProvinceId');
+
+  deleteProvButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const provinceId = this.getAttribute('data-id');
+      deleteProvIdInput.value = provinceId;
+      // must match your urls.py pattern:
+      deleteProvForm.action = `/locations/province/${provinceId}/delete/`;
+    });
+  });
+});
+
+</script>
+
+</body>
+</html>

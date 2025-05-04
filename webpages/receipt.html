@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background-color: #343a40;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .navbar-brand {
+            color: white;
+            font-weight: 600;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            font-weight: 500;
+        }
+        .profile-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ffc107;
+        }
+        .logout-btn {
+           
+            color: #dc3545;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            text-decoration: none;
+        }
+       
+        </style>
+<nav class="navbar navbar-dark">
+    <span class="navbar-brand">ECALSDS</span>
+    <div class="user-info">
+        <span>Welcome, {{ user.username }}</span>
+        <a href="{% url 'profile' %}">
+            {% if user.profile and user.profile.profile_picture %}
+            <img src="{{ user.profile.profile_picture.url }}" alt="Profile" class="profile-img">
+            {% else %}
+            <img src="/static/images/placeholder.png" alt="Profile" class="profile-img">
+            {% endif %}
+        </a>
+        <button class="back-button" onclick="history.back()">Back</button>
+        <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+    </div>
+</nav>
+  
+
+<div class="receipt-container">
+  
+    
+    <h3 class="receipt-title">Receipt #{{ transaction.receipt.receipt_number }}</h3>
+    <p class="receipt-date"><strong>Date:</strong> {{ transaction.created_at }}</p>
+    
+    <h4 class="receipt-subtitle">Products Ordered:</h4>
+    <div class="table-wrapper">
+        <table class="receipt-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Variety</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order_items %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>{{ item.variety.description }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>₱{{ item.variety.price }}</td>
+                    <td>₱{{ item.total_price }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <p class="receipt-total"><strong>Total:</strong> ₱{{ order.total_price }}</p>
+    
+    <div class="action-buttons">
+        {% if can_confirm_delivery %}
+        <form method="post" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" name="confirm_delivery" class="confirm-button">Confirm Delivery</button>
+        </form>
+        {% endif %}
+    
+        {% if can_cancel_order %}
+        <form method="post" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" name="cancel_order" class="cancel-button">Cancel Order</button>
+        </form>
+        {% endif %}
+    </div>    
+
+<style>
+    .action-buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    }
+
+    .confirm-button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        font-weight: bold;
+    }
+
+    .confirm-button:hover {
+        background-color: #45a049;
+    }
+
+    .cancel-button {
+        background-color: #f44336;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        font-weight: bold;
+    }
+
+    .cancel-button:hover {
+        background-color: #d32f2f;
+    }
+
+    .navbar{
+        background-color:  #343a40 ;
+    }
+    .receipt-container {
+        max-width: 600px;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        margin: 20px auto;
+        margin-top: 60px;
+    }
+
+    .back-button {
+        display: block;
+        background-color: blue;
+        color: white;
+        border: none;
+        padding: 5px 12px;
+        font-size: 14px;
+        cursor: pointer;
+        border-radius: 5px;
+        
+        transition: background 0.3s;
+        width: fit-content;
+    }
+
+    .back-button:hover {
+        background-color: rgb(0, 0, 227);
+        color: white;
+    }
+
+    .receipt-title {
+        text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+        color: black;
+        margin-bottom: 8px;
+    }
+
+    .receipt-date {
+        text-align: center;
+        font-size: 14px;
+        color: black;
+        margin-bottom: 15px;
+    }
+
+    .receipt-subtitle {
+        font-size: 16px;
+        font-weight: bold;
+        margin-top: 15px;
+        color:  black;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    .receipt-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        font-size: 14px;
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .receipt-table th, .receipt-table td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: left;
+    }
+
+    .receipt-table thead {
+        background-color:  #343a40;
+        color: white;
+    }
+
+    .receipt-table tbody tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    .receipt-total {
+        text-align: right;
+        font-size: 16px;
+        font-weight: bold;
+        margin-top: 15px;
+        color: black;
+    }
+</style>
